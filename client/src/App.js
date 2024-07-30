@@ -1,153 +1,71 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import axios from 'axios';
-import './App.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect } from 'react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
+const PAGE_SIZE = 10; // Número de registros por página
 
-const App = () => {
-    const [data, setData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const tableContainerRef = useRef(null);
-    const cache = useRef({});
+const PaginatedTable = () => {
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-    const fetchData = useCallback(async (searchTerm) => {
-        if (cache.current[searchTerm]) {
-            setData(cache.current[searchTerm].resultArray);
-            return;
-        }
+  // Función para obtener los datos
+  const fetchData = async () => {
+    const response = await fetch('/api/data');
+    const result = await response.json();
+    setData(result);
+    setTotalPages(Math.ceil(result.length / PAGE_SIZE));
+  };
 
-        try {
-            const response = await axios.get(API_URL, { params: { searchTerm } });
-            const fetchedData = response.data;
+  // Obtener los datos al montar el componente
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-            console.log('Fetched Data:', fetchedData); // Verifica los datos aquí
+  // Obtener los datos para la página actual
+  const paginatedData = data.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
-            // Transformar los datos a la estructura esperada
-            const transformedData = fetchedData.reduce((acc, { name, traffic_value, traffic_date }) => {
-                if (!acc[name]) {
-                    acc[name] = { name, traffic: {} };
-                }
-                acc[name].traffic[traffic_date] = traffic_value;
-                return acc;
-            }, {});
+  // Cambiar de página
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
-            const resultArray = Object.values(transformedData);
-            const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date)));
-
-            console.log('All Dates:', allDates); // Verifica las fechas aquí
-
-            setData(resultArray);
-            cache.current[searchTerm] = { resultArray, allDates };
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchData(searchTerm);
-    }, [fetchData, searchTerm]);
-
-    const getColor = (value) => {
-        if (value === undefined) return 'grey';
-        if (value <= 15) return 'red';
-        if (value > 15 && value <= 40) return 'orange';
-        if (value > 40 && value <= 90) return 'yellow';
-        return 'green'; // Valor > 90
-    };
-
-    const formatDate = (dateStr) => {
-        try {
-            const [day, month, year] = dateStr.split('/').reverse();
-            const date = new Date(`${year}-${month}-${day}`);
-            const options = { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' };
-            return date.toLocaleDateString('es-MX', options);
-        } catch (error) {
-            console.error('Error formatting date:', error);
-            return dateStr;
-        }
-    };
-
-    // Extraer las fechas del caché
-    const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
-    console.log('Dates:', dates); // Verifica las fechas aquí
-
-    const scrollTable = (direction) => {
-        const container = tableContainerRef.current;
-        const scrollAmount = 200;
-
-        if (direction === 'left') {
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        } else if (direction === 'right') {
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        }
-    };
-
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    return (
-        <div className="App">
-            <header className="navbar">
-                <div className="navbar-container">
-                    <h1>Gerencia Corporativa de Ingeniería y Planeación de RAN</h1>
-                    <nav>
-                        <img src="/images/logo.png" className="logo" alt="Logo"/>
-                    </nav>
-                </div>
-            </header>
-
-            <div className="search-container">
-                <div className="search-box">
-                    <input
-                        type="text"
-                        placeholder="Buscar por radiobase..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        className="search-input"
-                    />
-                    <button className="search-button">
-                        <FontAwesomeIcon icon={faSearch} />
-                    </button>
-                </div>
-            </div>
-
-            <div className="table-wrapper">
-                <div className="carousel-controls">
-                    <button onClick={() => scrollTable('left')} className="carousel-button">
-                        <FontAwesomeIcon icon={faArrowLeft} />
-                    </button>
-                    <button onClick={() => scrollTable('right')} className="carousel-button">
-                        <FontAwesomeIcon icon={faArrowRight} />
-                    </button>
-                </div>
-                <div className="table-container" ref={tableContainerRef}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Radiobases</th>
-                                {dates.map(date => <th key={date}>{formatDate(date)}</th>)}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((radiobase) => (
-                                <tr key={radiobase.name}>
-                                    <td>{radiobase.name}</td>
-                                    {dates.map(date => (
-                                        <td key={date} className={getColor(radiobase.traffic[date])}>
-                                            {radiobase.traffic[date] || ''}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Columna 1</th>
+            <th>Columna 2</th>
+            {/* Agrega más encabezados según sea necesario */}
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedData.map((item, index) => (
+            <tr key={index}>
+              <td>{item.columna1}</td>
+              <td>{item.columna2}</td>
+              {/* Agrega más celdas según sea necesario */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div>
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+          Anterior
+        </button>
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+          Siguiente
+        </button>
+      </div>
+    </div>
+  );
 };
 
-export default App;
+export default PaginatedTable;
