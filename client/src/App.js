@@ -4,8 +4,8 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
-const ITEMS_PER_PAGE = 20; // Cambiado a 20
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api/radiobases'; // Cambiado al URL adecuado
+const ITEMS_PER_PAGE = 20; // Número de ítems por página
 
 const App = () => {
     const [data, setData] = useState([]);
@@ -14,7 +14,12 @@ const App = () => {
     const tableContainerRef = useRef(null);
     const cache = useRef({});
 
-    // Función para filtrar y actualizar datos
+    // Hook para obtener datos cuando cambia el término de búsqueda
+    useEffect(() => {
+        fetchData(searchTerm);
+    }, [searchTerm]);
+
+    // Función para obtener datos de la API
     const fetchData = useCallback(async (searchTerm) => {
         if (cache.current[searchTerm]) {
             setData(cache.current[searchTerm].resultArray);
@@ -47,11 +52,7 @@ const App = () => {
         }
     }, []);
 
-    useEffect(() => {
-        fetchData(searchTerm);
-    }, [fetchData, searchTerm]);
-
-    // Función para obtener el color basado en el valor
+    // Función para determinar el color de la celda basado en el valor
     const getColor = (value) => {
         if (value === undefined) return 'grey';
         if (value <= 15) return 'red';
@@ -60,6 +61,19 @@ const App = () => {
         return 'green';
     };
 
+    // Función para formatear la fecha en español
+    const formatDate = (dateStr) => {
+        try {
+            const date = new Date(dateStr);
+            const options = { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' };
+            return date.toLocaleDateString('es-MX', options);
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return dateStr;
+        }
+    };
+
+    // Obtener las fechas de los datos
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
     console.log('Dates:', dates);
 
@@ -67,6 +81,25 @@ const App = () => {
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
+    // Función para desplazar la tabla horizontalmente
+    const scrollTable = (direction) => {
+        const container = tableContainerRef.current;
+        const scrollAmount = 200;
+
+        if (direction === 'left') {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        } else if (direction === 'right') {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
+
+    // Manejar el cambio en el campo de búsqueda
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setCurrentPage(1); // Resetear a la primera página al realizar una búsqueda
+    };
+
+    // Manejar el cambio de página
     const handlePageChange = (direction) => {
         setCurrentPage(prevPage => {
             if (direction === 'next') {
@@ -76,11 +109,6 @@ const App = () => {
             }
             return prevPage;
         });
-    };
-
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-        setCurrentPage(1); // Resetear a la primera página al realizar una búsqueda
     };
 
     return (
@@ -93,7 +121,8 @@ const App = () => {
                     </nav>
                 </div>
             </header>
-
+            
+            {/* Contenedor de búsqueda */}
             <div className="search-container">
                 <div className="search-box">
                     <input
@@ -109,6 +138,7 @@ const App = () => {
                 </div>
             </div>
 
+            {/* Contenedor de la tabla con controles de carrusel */}
             <div className="table-wrapper">
                 <div className="carousel-controls">
                     <button
@@ -131,7 +161,7 @@ const App = () => {
                         <thead>
                             <tr>
                                 <th>Radiobases</th>
-                                {dates.map(date => <th key={date}>{date}</th>)}
+                                {dates.map(date => <th key={date}>{formatDate(date)}</th>)}
                             </tr>
                         </thead>
                         <tbody>
