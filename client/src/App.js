@@ -1,96 +1,156 @@
-import React, { useState, useEffect } from 'react';
-import './App.css'; // Asegúrate de tener este archivo si usas estilos
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import axios from 'axios';
+import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { format, parseISO } from 'date-fns'; // Importa solo si usas formateo de fechas
 
-function App() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
+const ITEMS_PER_PAGE = 5;
 
-  useEffect(() => {
-    // Función para obtener datos, por ejemplo desde una API
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/data'); // Reemplaza con tu endpoint
-        const result = await response.json();
-        setData(result);
-        setFilteredData(result); // Inicializa filteredData
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
+const App = () => {
+    const [data, setData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const tableContainerRef = useRef(null);
+    const cache = useRef({});
+
+    const fetchData = useCallback(async (searchTerm) => {
+        if (cache.current[searchTerm]) {
+            setData(cache.current[searchTerm].resultArray);
+            return;
+        }
+
+        try {
+            const response = await axios.get(API_URL, { params: { searchTerm } });
+            const fetchedData = response.data;
+
+            console.log('Fetched Data:', fetchedData);
+
+            const transformedData = fetchedData.reduce((acc, { name, traffic_value, traffic_date }) => {
+                if (!acc[name]) {
+                    acc[name] = { name, traffic: {} };
+                }
+                acc[name].traffic[traffic_date] = traffic_value;
+                return acc;
+            }, {});
+
+            const resultArray = Object.values(transformedData);
+            const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date))).sort();
+
+            console.log('All Dates:', allDates);
+
+            setData(resultArray);
+            cache.current[searchTerm] = { resultArray, allDates };
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData(searchTerm);
+    }, [fetchData, searchTerm]);
+
+    const getColor = (value) => {
+        if (value === undefined) return 'grey';
+        if (value <= 15) return 'red';
+        if (value > 15 && value <= 40) return 'orange';
+        if (value > 40 && value <= 90) return 'yellow';
+        return 'green';
     };
 
-    fetchData();
-  }, []);
+    const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
+    console.log('Dates:', dates);
 
-  useEffect(() => {
-    // Filtra datos basado en el término de búsqueda
-    const result = data.filter(item => 
-      item.radiobase.toLowerCase().includes(searchTerm.toLowerCase())
+    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+    const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    const handlePageChange = (direction) => {
+        setCurrentPage(prevPage => {
+            if (direction === 'next') {
+                return Math.min(prevPage + 1, totalPages);
+            } else if (direction === 'prev') {
+                return Math.max(prevPage - 1, 1);
+            }
+            return prevPage;
+        });
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setCurrentPage(1); // Resetear a la primera página al realizar una búsqueda
+    };
+
+    return (
+        <div className="App">
+            <header className="navbar">
+                <div className="navbar-container">
+                    <h1>Gerencia Corporativa de Ingeniería y Planeación de RAN</h1>
+                    <nav>
+                        <img src="/images/logo.png" className="logo" alt="Logo"/>
+                    </nav>
+                </div>
+            </header>
+
+            <div className="search-container">
+                <div className="search-box">
+                    <input
+                        type="text"
+                        placeholder="Buscar por radiobase..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="search-input"
+                    />
+                    <button className="search-button">
+                        <FontAwesomeIcon icon={faSearch} />
+                    </button>
+                </div>
+            </div>
+
+            <div className="table-wrapper">
+                <div className="carousel-controls">
+                    <button
+                        onClick={() => handlePageChange('prev')}
+                        className="carousel-button"
+                        disabled={currentPage === 1}
+                    >
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                    <button
+                        onClick={() => handlePageChange('next')}
+                        className="carousel-button"
+                        disabled={currentPage === totalPages}
+                    >
+                        <FontAwesomeIcon icon={faArrowRight} />
+                    </button>
+                </div>
+                <div className="table-container" ref={tableContainerRef}>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Radiobases</th>
+                                {dates.map(date => <th key={date}>{date}</th>)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {paginatedData.map((radiobase) => (
+                                <tr key={radiobase.name}>
+                                    <td>{radiobase.name}</td>
+                                    {dates.map(date => (
+                                        <td key={date} className={getColor(radiobase.traffic[date])}>
+                                            {radiobase.traffic[date] || ''}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="pagination-controls">
+                    <span>Página {currentPage} de {totalPages}</span>
+                </div>
+            </div>
+        </div>
     );
-    setFilteredData(result);
-  }, [searchTerm, data]);
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Mi Aplicación</h1>
-        <div className="search">
-          <input 
-            type="text" 
-            placeholder="Buscar..." 
-            value={searchTerm} 
-            onChange={handleSearchChange} 
-          />
-          <button>
-            <FontAwesomeIcon icon={faSearch} />
-          </button>
-        </div>
-      </header>
-      <main>
-        {loading ? (
-          <p>Cargando datos...</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Radiobases</th>
-                {/* Aquí puedes agregar más encabezados si es necesario */}
-                {/* Ejemplo: <th>Fecha</th> */}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.radiobase}</td>
-                  {/* Ejemplo de formato de fecha, solo si tienes una fecha */}
-                  {/* <td>{item.date ? format(parseISO(item.date), 'dd-MM-yyyy') : 'No disponible'}</td> */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {/* Ejemplo de paginación */}
-        <div className="pagination">
-          <button>
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>
-          <button>
-            <FontAwesomeIcon icon={faArrowRight} />
-          </button>
-        </div>
-      </main>
-    </div>
-  );
-}
+};
 
 export default App;
