@@ -10,6 +10,7 @@
   width: 100%;
   overflow-x: auto;
   display: block;
+  margin-top: 60px; /* Ajustado para agregar espacio superior */
 }
 
 .table-container {
