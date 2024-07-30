@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './PaginatedTable.css'; // Importa un archivo de estilo CSS si es necesario
+import './App.css'; // Importa un archivo de estilo CSS si es necesario
 
 // Define el tamaño de la página
 const PAGE_SIZE = 10;
@@ -87,4 +87,4 @@ const PaginatedTable = () => {
   );
 };
 
-export default PaginatedTable;
+export default App;
