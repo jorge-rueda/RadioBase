@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const uri = process.env.MONGO_URI;
+const uri = process.env.MONGO_URI; // Asegúrate de que MONGO_URI esté configurado correctamente
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let db;
@@ -10,8 +10,8 @@ async function connectToDatabase() {
   if (!db) {
     try {
       await client.connect();
-      db = client.db('radiobase'); // Nombre de la base de datos
-      collection = db.collection('radiobase'); // Nombre de la colección
+      db = client.db('radiobase'); // Reemplaza con el nombre de tu base de datos
+      collection = db.collection('radiobase'); // Reemplaza con el nombre de tu colección
     } catch (error) {
       console.error('Failed to connect to database:', error);
       throw new Error('Database connection error');
@@ -22,7 +22,7 @@ async function connectToDatabase() {
 exports.handler = async function(event, context) {
   try {
     await connectToDatabase();
-    const documents = await collection.find({}).limit(1000).toArray(); // Ajusta el límite según sea necesario
+    const documents = await collection.find({}).limit(100).toArray();
 
 
     return {
