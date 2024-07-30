@@ -58,18 +58,6 @@ const App = () => {
         return 'green';
     };
 
-    const formatDate = (dateStr) => {
-        try {
-            const [day, month, year] = dateStr.split('/').reverse();
-            const date = new Date(`${year}-${month}-${day}`);
-            const options = { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' };
-            return date.toLocaleDateString('es-MX', options);
-        } catch (error) {
-            console.error('Error formatting date:', error);
-            return dateStr;
-        }
-    };
-
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
     console.log('Dates:', dates);
 
@@ -140,7 +128,7 @@ const App = () => {
                         <thead>
                             <tr>
                                 <th>Radiobases</th>
-                                {dates.map(date => <th key={date}>{formatDate(date)}</th>)}
+                                {dates.map(date => <th key={date}>{date}</th>)}
                             </tr>
                         </thead>
                         <tbody>
