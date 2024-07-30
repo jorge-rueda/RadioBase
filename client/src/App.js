@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
-const API_URL = process.env.REACT_APP_API_URL || 'netlify/functions//api-radiobases.js';
+const API_URL = process.env.REACT_APP_API_URL || 'netlify/functions/api-radiobases.js';
 
 const App = () => {
     const [data, setData] = useState([]); 
