@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
+app.use(cors({
+    origin: 'https://tu-dominio-en-netlify.netlify.app'  
+}));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
