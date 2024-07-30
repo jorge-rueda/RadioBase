@@ -25,7 +25,7 @@ async function connectToDatabase() {
 exports.handler = async function(event, context) {
   try {
     await connectToDatabase();
-    const documents = await collection.find({}).limit(100).toArray();
+    const documents = await collection.find({}).limit(20000).toArray();
 
     return {
       statusCode: 200,
