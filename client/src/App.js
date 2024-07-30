@@ -1,29 +1,23 @@
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
-import './App.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-
 const App = () => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const tableContainerRef = useRef(null);
 
-    // Hook para obtener datos cuando cambia el término de búsqueda
     useEffect(() => {
         fetchData(searchTerm);
     }, [searchTerm]);
 
-    // Función para obtener datos de la API
     const fetchData = (searchTerm) => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/radiobases`, {
             params: { searchTerm }
         })
-        .then(response => setData(response.data))
+        .then(response => {
+            console.log('Data received:', response.data); // Añadido para depuración
+            setData(response.data);
+        })
         .catch(error => console.error('Error fetching data:', error));
     };
 
-    // Función para determinar el color de la celda basado en el valor
     const getColor = (value) => {
         if (value === undefined) return 'grey';
         if (value <= 15) return 'red';
@@ -32,7 +26,6 @@ const App = () => {
         if (value > 90) return 'green';
     };
 
-    // Función para formatear la fecha en español
     const formatDate = (dateStr) => {
         try {
             const date = new Date(dateStr);
@@ -44,10 +37,8 @@ const App = () => {
         }
     };
 
-    // Obtener las fechas de los datos
     const dates = data.length && data[0].traffic ? Object.keys(data[0].traffic) : [];
 
-    // Función para desplazar la tabla horizontalmente
     const scrollTable = (direction) => {
         const container = tableContainerRef.current;
         const scrollAmount = 200;
@@ -59,7 +50,6 @@ const App = () => {
         }
     };
 
-    // Manejar el cambio en el campo de búsqueda
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
@@ -75,7 +65,6 @@ const App = () => {
                 </div>
             </header>
             
-            {/* Contenedor de búsqueda */}
             <div className="search-container">
                 <div className="search-box">
                     <input
@@ -91,7 +80,6 @@ const App = () => {
                 </div>
             </div>
 
-            {/* Contenedor de la tabla con controles de carrusel */}
             <div className="table-wrapper">
                 <div className="carousel-controls">
                     <button onClick={() => scrollTable('left')} className="carousel-button">
@@ -110,16 +98,22 @@ const App = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((radiobase) => (
-                                <tr key={radiobase.name}>
-                                    <td>{radiobase.name}</td>
-                                    {dates.map(date => (
-                                        <td key={date} className={getColor(radiobase.traffic[date])}>
-                                            {radiobase.traffic[date] || ''}
-                                        </td>
-                                    ))}
+                            {data.length > 0 ? (
+                                data.map((radiobase) => (
+                                    <tr key={radiobase.name}>
+                                        <td>{radiobase.name}</td>
+                                        {dates.map(date => (
+                                            <td key={date} className={getColor(radiobase.traffic[date])}>
+                                                {radiobase.traffic[date] || ''}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={dates.length + 1}>No data available</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
