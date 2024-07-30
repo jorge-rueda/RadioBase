@@ -4,8 +4,8 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-// Caché para los resultados en el frontend
-const cache = {};
+
+const API_URL = process.env.REACT_APP_API_URL || './netlify/functions//api-radiobases.js';
 
 const App = () => {
     const [data, setData] = useState([]); 
@@ -24,7 +24,7 @@ const App = () => {
         }
 
         try {
-            const response = await axios.get('/.netlify/functions/api-radiobases', {
+            const response = await axios.get(API_URL, {
                 params: { searchTerm }
             });
 
