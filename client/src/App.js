@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 20; // Cambiado a 20
 
 const App = () => {
     const [data, setData] = useState([]);

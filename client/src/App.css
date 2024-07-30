@@ -78,13 +78,13 @@ td:first-child, th:first-child {
 
 /* Estilos para los Controles del Carrusel */
 .carousel-controls {
-  z-index: 0;
-  top: -5px;
+  position: fixed; /* Cambiado a fixed */
+  bottom: 10px; /* Ajusta según sea necesario */
+  right: 10px; /* Ajusta según sea necesario */
   display: flex;
-  position: relative;
   justify-content: space-between; 
-  width: 100%; 
-  margin-top: 10px; 
+  width: auto; /* Ajustado para solo ocupar el espacio necesario */
+  z-index: 100; /* Asegúrate de que esté por encima de otros elementos */
 }
 
 .carousel-button {
