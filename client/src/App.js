@@ -4,20 +4,21 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-
-const API_URL = process.env.REACT_APP_API_URL || 'netlify/functions/api-radiobases';
+// Usa la URL de la API desde las variables de entorno, o la URL predeterminada
+const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
 
 const App = () => {
     const [data, setData] = useState([]); 
     const [searchTerm, setSearchTerm] = useState('');  
     const tableContainerRef = useRef(null);  
+    const cache = {}; // Define el caché aquí
 
     useEffect(() => {
         fetchData(searchTerm);
     }, [searchTerm]);
 
     const fetchData = async (searchTerm) => {
-        // Verifica si los datos están en el caché local
+        // Verifica si los resultados están en el caché
         if (cache[searchTerm]) {
             setData(cache[searchTerm]);
             return;

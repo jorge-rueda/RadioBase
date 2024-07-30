@@ -37,7 +37,7 @@ app.get('/api/radiobases', async (req, res) => {
     }
 
     try {
-        const collection = db.collection('radiobases');
+        const collection = db.collection('radiobase');
         const query = searchTerm ? { name: { $regex: searchTerm, $options: 'i' } } : {};
         const results = await collection.find(query).sort({ name: 1, traffic_date: 1 }).toArray();
 
