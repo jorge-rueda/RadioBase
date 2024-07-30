@@ -4,8 +4,8 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api/radiobases'; // Cambiado al URL adecuado
-const ITEMS_PER_PAGE = 20; // Número de ítems por página
+const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
+const ITEMS_PER_PAGE = 20; // Actualiza aquí para mostrar 20 elementos por página
 
 const App = () => {
     const [data, setData] = useState([]);
@@ -14,12 +14,7 @@ const App = () => {
     const tableContainerRef = useRef(null);
     const cache = useRef({});
 
-    // Hook para obtener datos cuando cambia el término de búsqueda
-    useEffect(() => {
-        fetchData(searchTerm);
-    }, [searchTerm]);
-
-    // Función para obtener datos de la API
+    // Función para obtener datos de la API y actualizar el estado
     const fetchData = useCallback(async (searchTerm) => {
         if (cache.current[searchTerm]) {
             setData(cache.current[searchTerm].resultArray);
@@ -52,6 +47,10 @@ const App = () => {
         }
     }, []);
 
+    useEffect(() => {
+        fetchData(searchTerm);
+    }, [fetchData, searchTerm]);
+
     // Función para determinar el color de la celda basado en el valor
     const getColor = (value) => {
         if (value === undefined) return 'grey';
@@ -75,9 +74,7 @@ const App = () => {
 
     // Obtener las fechas de los datos
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
-    console.log('Dates:', dates);
 
-    // Paginación
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
@@ -121,8 +118,7 @@ const App = () => {
                     </nav>
                 </div>
             </header>
-            
-            {/* Contenedor de búsqueda */}
+
             <div className="search-container">
                 <div className="search-box">
                     <input
@@ -138,7 +134,6 @@ const App = () => {
                 </div>
             </div>
 
-            {/* Contenedor de la tabla con controles de carrusel */}
             <div className="table-wrapper">
                 <div className="carousel-controls">
                     <button
