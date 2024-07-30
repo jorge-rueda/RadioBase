@@ -21,8 +21,20 @@ const App = () => {
         try {
             const response = await axios.get(API_URL, { params: { searchTerm } });
             const fetchedData = response.data;
-            setData(fetchedData);
-            cache.current[searchTerm] = fetchedData;
+
+            // Transformar los datos a la estructura esperada
+            const transformedData = fetchedData.reduce((acc, { name, traffic_value, traffic_date }) => {
+                if (!acc[name]) {
+                    acc[name] = { name, traffic: {} };
+                }
+                acc[name].traffic[traffic_date] = traffic_value;
+                return acc;
+            }, {});
+
+            const resultArray = Object.values(transformedData);
+
+            setData(resultArray);
+            cache.current[searchTerm] = resultArray;
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -42,7 +54,8 @@ const App = () => {
 
     const formatDate = (dateStr) => {
         try {
-            const date = new Date(dateStr);
+            const [day, month, year] = dateStr.split('/').reverse();
+            const date = new Date(`${year}-${month}-${day}`);
             const options = { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' };
             return date.toLocaleDateString('es-MX', options);
         } catch (error) {
@@ -116,8 +129,8 @@ const App = () => {
                                 <tr key={radiobase.name}>
                                     <td>{radiobase.name}</td>
                                     {dates.map(date => (
-                                        <td key={date} className={getColor(radiobase.traffic[date]?.traffic_value)}>
-                                            {radiobase.traffic[date]?.traffic_value || ''}
+                                        <td key={date} className={getColor(radiobase.traffic[date])}>
+                                            {radiobase.traffic[date] || ''}
                                         </td>
                                     ))}
                                 </tr>
