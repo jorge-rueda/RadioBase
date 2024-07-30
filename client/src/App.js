@@ -33,8 +33,11 @@ const App = () => {
 
             const resultArray = Object.values(transformedData);
 
+            // Obtener todas las fechas únicas
+            const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date)));
+
             setData(resultArray);
-            cache.current[searchTerm] = resultArray;
+            cache.current[searchTerm] = { resultArray, allDates };
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -64,7 +67,8 @@ const App = () => {
         }
     };
 
-    const dates = data.length ? Object.keys(data[0].traffic || {}) : [];
+    // Extraer las fechas del caché
+    const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
 
     const scrollTable = (direction) => {
         const container = tableContainerRef.current;
