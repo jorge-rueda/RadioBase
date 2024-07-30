@@ -16,7 +16,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             body: JSON.stringify(cache[cacheKey]),
             headers: {
-                'Access-Control-Allow-Origin': 'https://radiobase.netlify.app/', // Change '*' to your domain in production
+                'Access-Control-Allow-Origin': 'https://radiobase.netlify.app/.netlify/functions/api-rediobases', // Change '*' to your domain in production
             },
         };
     }
@@ -50,7 +50,7 @@ exports.handler = async (event) => {
             statusCode: 500,
             body: JSON.stringify({ error: 'Internal Server Error' }),
             headers: {
-                'Access-Control-Allow-Origin': 'https://radiobase.netlify.app/',
+                'Access-Control-Allow-Origin': 'https://radiobase.netlify.app/.netlify/functions/api-rediobases',
             },
         };
     } finally {
@@ -65,7 +65,7 @@ exports.handler = async (event) => {
         statusCode: 200,
         body: JSON.stringify(results),
         headers: {
-            'Access-Control-Allow-Origin': 'https://radiobase.netlify.app/', 
+            'Access-Control-Allow-Origin': 'https://radiobase.netlify.app/.netlify/functions/api-rediobases', 
         },
     };
 };
