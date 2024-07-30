@@ -4,33 +4,25 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-// Usa la URL de la API desde las variables de entorno, o la URL predeterminada
 const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
 
 const App = () => {
     const [data, setData] = useState([]); 
     const [searchTerm, setSearchTerm] = useState('');  
     const tableContainerRef = useRef(null);  
-    const cache = useRef({}).current;
+    const cache = useRef({}); // Use useRef for cache
 
-    // Usa useCallback para memorizar fetchData
     const fetchData = useCallback(async (searchTerm) => {
-        // Verifica si los resultados están en el caché
-        if (cache[searchTerm]) {
-            setData(cache[searchTerm]);
+        if (cache.current[searchTerm]) {
+            setData(cache.current[searchTerm]);
             return;
         }
 
         try {
-            const response = await axios.get(API_URL, {
-                params: { searchTerm }
-            });
-
+            const response = await axios.get(API_URL, { params: { searchTerm } });
             const fetchedData = response.data;
             setData(fetchedData);
-
-            // Almacena los datos en el caché local
-            cache[searchTerm] = fetchedData;
+            cache.current[searchTerm] = fetchedData;
         } catch (error) {
             console.error('Error fetching data:', error);
         }
