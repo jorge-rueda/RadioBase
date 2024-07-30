@@ -272,3 +272,15 @@ td:first-child, th:first-child {
 body {
   margin-top: 60px;
 }
+
+/* Estilos para los Controles de Paginación */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination-controls span {
+  font-size: 16px;
+  margin: 0 10px;
+}

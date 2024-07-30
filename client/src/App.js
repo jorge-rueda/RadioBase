@@ -5,10 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
+const ITEMS_PER_PAGE = 5;
 
 const App = () => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
     const tableContainerRef = useRef(null);
     const cache = useRef({});
 
@@ -73,6 +75,26 @@ const App = () => {
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
     console.log('Dates:', dates); // Verifica las fechas aquí
 
+    // Paginación
+    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+    const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    const handlePageChange = (direction) => {
+        setCurrentPage(prevPage => {
+            if (direction === 'next') {
+                return Math.min(prevPage + 1, totalPages);
+            } else if (direction === 'prev') {
+                return Math.max(prevPage - 1, 1);
+            }
+            return prevPage;
+        });
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setCurrentPage(1); // Resetear a la primera página al realizar una búsqueda
+    };
+
     const scrollTable = (direction) => {
         const container = tableContainerRef.current;
         const scrollAmount = 200;
@@ -82,10 +104,6 @@ const App = () => {
         } else if (direction === 'right') {
             container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
-    };
-
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
     };
 
     return (
@@ -116,10 +134,18 @@ const App = () => {
 
             <div className="table-wrapper">
                 <div className="carousel-controls">
-                    <button onClick={() => scrollTable('left')} className="carousel-button">
+                    <button
+                        onClick={() => handlePageChange('prev')}
+                        className="carousel-button"
+                        disabled={currentPage === 1}
+                    >
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </button>
-                    <button onClick={() => scrollTable('right')} className="carousel-button">
+                    <button
+                        onClick={() => handlePageChange('next')}
+                        className="carousel-button"
+                        disabled={currentPage === totalPages}
+                    >
                         <FontAwesomeIcon icon={faArrowRight} />
                     </button>
                 </div>
@@ -132,7 +158,7 @@ const App = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((radiobase) => (
+                            {paginatedData.map((radiobase) => (
                                 <tr key={radiobase.name}>
                                     <td>{radiobase.name}</td>
                                     {dates.map(date => (
@@ -144,6 +170,9 @@ const App = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+                <div className="pagination-controls">
+                    <span>Página {currentPage} de {totalPages}</span>
                 </div>
             </div>
         </div>
