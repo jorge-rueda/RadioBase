@@ -11,5 +11,5 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api-radiobase"
+  to = "/.netlify/functions/api-radiobases"
   status = 200
