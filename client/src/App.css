@@ -7,29 +7,22 @@
 }
 
 .table-wrapper {
-  position: relative;
-  top: 25%;
-  width: 80%;
-  height: auto; 
-  overflow: hidden; 
+  width: 100%;
+  overflow-x: auto;
   display: block;
-  padding-top: 1%;
 }
 
 .table-container {
-  display: flex;
-  overflow-x: auto;
-  height: auto;
-  white-space: nowrap;
+  min-width: 100%;
 }
 
 table {
   border-collapse: separate;
   border-spacing: 0;
-  min-width: 1000px;
-  width: 100%;
   background-color: #fff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  width: max-content; /* Permite que la tabla se ajuste a su contenido */
 }
 
 thead th {
@@ -271,16 +264,4 @@ td:first-child, th:first-child {
 
 body {
   margin-top: 60px;
-}
-
-/* Estilos para los Controles de Paginación */
-.pagination-controls {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.pagination-controls span {
-  font-size: 16px;
-  margin: 0 10px;
 }

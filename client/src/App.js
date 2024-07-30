@@ -1,25 +1,17 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
-const ITEMS_PER_PAGE = 5;
 
 const App = () => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const tableContainerRef = useRef(null);
-    const cache = useRef({});
+    const [dates, setDates] = useState([]);
 
     const fetchData = useCallback(async (searchTerm) => {
-        if (cache.current[searchTerm]) {
-            setData(cache.current[searchTerm].resultArray);
-            return;
-        }
-
         try {
             const response = await axios.get(API_URL, { params: { searchTerm } });
             const fetchedData = response.data;
@@ -40,7 +32,7 @@ const App = () => {
             console.log('All Dates:', allDates);
 
             setData(resultArray);
-            cache.current[searchTerm] = { resultArray, allDates };
+            setDates(allDates);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -58,26 +50,8 @@ const App = () => {
         return 'green';
     };
 
-    const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
-    console.log('Dates:', dates);
-
-    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-    const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-    const handlePageChange = (direction) => {
-        setCurrentPage(prevPage => {
-            if (direction === 'next') {
-                return Math.min(prevPage + 1, totalPages);
-            } else if (direction === 'prev') {
-                return Math.max(prevPage - 1, 1);
-            }
-            return prevPage;
-        });
-    };
-
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(1); // Resetear a la primera página al realizar una búsqueda
     };
 
     return (
@@ -107,23 +81,7 @@ const App = () => {
             </div>
 
             <div className="table-wrapper">
-                <div className="carousel-controls">
-                    <button
-                        onClick={() => handlePageChange('prev')}
-                        className="carousel-button"
-                        disabled={currentPage === 1}
-                    >
-                        <FontAwesomeIcon icon={faArrowLeft} />
-                    </button>
-                    <button
-                        onClick={() => handlePageChange('next')}
-                        className="carousel-button"
-                        disabled={currentPage === totalPages}
-                    >
-                        <FontAwesomeIcon icon={faArrowRight} />
-                    </button>
-                </div>
-                <div className="table-container" ref={tableContainerRef}>
+                <div className="table-container">
                     <table>
                         <thead>
                             <tr>
@@ -132,21 +90,25 @@ const App = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedData.map((radiobase) => (
+                            {data.map((radiobase) => (
                                 <tr key={radiobase.name}>
                                     <td>{radiobase.name}</td>
-                                    {dates.map(date => (
-                                        <td key={date} className={getColor(radiobase.traffic[date])}>
-                                            {radiobase.traffic[date] || ''}
-                                        </td>
-                                    ))}
+                                    {dates.map((date, index) => {
+                                        const value = radiobase.traffic[date];
+                                        const nextDate = dates[index + 1];
+                                        const nextValue = nextDate ? radiobase.traffic[nextDate] : '';
+
+                                        return (
+                                            <td key={date} className={getColor(value)}>
+                                                {value || ''}
+                                                {nextDate && <div className="next-date-value">{nextValue || ''}</div>}
+                                            </td>
+                                        );
+                                    })}
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
-                <div className="pagination-controls">
-                    <span>Página {currentPage} de {totalPages}</span>
                 </div>
             </div>
         </div>
