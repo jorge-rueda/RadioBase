@@ -16,7 +16,7 @@ const App = () => {
 
     // Función para obtener datos de la API
     const fetchData = (searchTerm) => {
-        axios.get('http://localhost:3000/api/radiobases', {
+        axios.get(`${process.env.REACT_APP_API_URL}/api/radiobases`, {
             params: { searchTerm }
         })
         .then(response => setData(response.data))
