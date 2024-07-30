@@ -132,16 +132,22 @@ const App = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedData.map((radiobase) => (
-                                <tr key={radiobase.name}>
-                                    <td>{radiobase.name}</td>
-                                    {dates.map(date => (
-                                        <td key={date} className={getColor(radiobase.traffic[date])}>
-                                            {radiobase.traffic[date] || ''}
-                                        </td>
-                                    ))}
+                            {paginatedData.length > 0 ? (
+                                paginatedData.map((radiobase) => (
+                                    <tr key={radiobase.name}>
+                                        <td>{radiobase.name}</td>
+                                        {dates.map(date => (
+                                            <td key={date} className={getColor(radiobase.traffic[date])}>
+                                                {radiobase.traffic[date] || ''}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={dates.length + 1}>No data available</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
