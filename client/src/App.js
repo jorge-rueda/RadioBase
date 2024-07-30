@@ -24,9 +24,8 @@ const App = () => {
             const response = await axios.get(API_URL, { params: { searchTerm } });
             const fetchedData = response.data;
 
-            console.log('Fetched Data:', fetchedData); // Verifica los datos aquí
+            console.log('Fetched Data:', fetchedData);
 
-            // Transformar los datos a la estructura esperada
             const transformedData = fetchedData.reduce((acc, { name, traffic_value, traffic_date }) => {
                 if (!acc[name]) {
                     acc[name] = { name, traffic: {} };
@@ -38,7 +37,7 @@ const App = () => {
             const resultArray = Object.values(transformedData);
             const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date)));
 
-            console.log('All Dates:', allDates); // Verifica las fechas aquí
+            console.log('All Dates:', allDates);
 
             setData(resultArray);
             cache.current[searchTerm] = { resultArray, allDates };
@@ -56,7 +55,7 @@ const App = () => {
         if (value <= 15) return 'red';
         if (value > 15 && value <= 40) return 'orange';
         if (value > 40 && value <= 90) return 'yellow';
-        return 'green'; // Valor > 90
+        return 'green';
     };
 
     const formatDate = (dateStr) => {
@@ -71,11 +70,9 @@ const App = () => {
         }
     };
 
-    // Extraer las fechas del caché
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
-    console.log('Dates:', dates); // Verifica las fechas aquí
+    console.log('Dates:', dates);
 
-    // Paginación
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
@@ -93,17 +90,6 @@ const App = () => {
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
         setCurrentPage(1); // Resetear a la primera página al realizar una búsqueda
-    };
-
-    const scrollTable = (direction) => {
-        const container = tableContainerRef.current;
-        const scrollAmount = 200;
-
-        if (direction === 'left') {
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        } else if (direction === 'right') {
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        }
     };
 
     return (
