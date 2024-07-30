@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './PaginatedTable.css'; // Importa un archivo de estilo CSS si es necesario
 
 // Define el tamaño de la página
 const PAGE_SIZE = 10;
@@ -42,36 +43,44 @@ const PaginatedTable = () => {
   };
 
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Valor de Tráfico</th>
-            <th>Fecha de Tráfico</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedData.map((item) => (
-            <tr key={item._id}>
-              <td>{item._id}</td>
-              <td>{item.name}</td>
-              <td>{item.traffic_value}</td>
-              <td>{item.traffic_date}</td>
+    <div className="table-wrapper">
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Valor de Tráfico</th>
+              <th>Fecha de Tráfico</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div>
-        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-          Anterior
+          </thead>
+          <tbody>
+            {paginatedData.map((item) => (
+              <tr key={item._id}>
+                <td>{item.name}</td>
+                <td>{item.traffic_value}</td>
+                <td>{item.traffic_date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="carousel-controls">
+        <button
+          className="carousel-button"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          &lt;
         </button>
-        <span>
+        <span className="pagination-info">
           Página {currentPage} de {totalPages}
         </span>
-        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-          Siguiente
+        <button
+          className="carousel-button"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          &gt;
         </button>
       </div>
     </div>

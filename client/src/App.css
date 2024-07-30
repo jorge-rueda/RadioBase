@@ -1,17 +1,12 @@
-/* Estilos Generales */
-.App {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+/* PaginatedTable.css */
 
+/* Ajustes para la tabla paginada */
 .table-wrapper {
   position: relative;
   top: 25%;
   width: 80%;
-  height: auto; 
-  overflow: hidden; 
+  height: auto;
+  overflow: hidden;
   display: block;
   padding-top: 1%;
 }
@@ -55,8 +50,8 @@ th {
 td:first-child, th:first-child {
   position: sticky;
   left: 0;
-  background-color: rgb(229, 229, 229); 
-  z-index: 2; 
+  background-color: rgb(229, 229, 229);
+  z-index: 2;
 }
 
 .red {
@@ -83,192 +78,48 @@ td:first-child, th:first-child {
   background-color: rgba(128, 128, 128, 0.700);
 }
 
-/* Estilos para los Controles del Carrusel */
+/* Estilos para los Controles de Paginación */
 .carousel-controls {
   z-index: 0;
   top: -5px;
   display: flex;
   position: relative;
-  justify-content: space-between; 
-  width: 100%; 
-  margin-top: 10px; 
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .carousel-button {
-  background-color: #007bff; 
+  background-color: #007bff;
   border: none;
   color: white;
   font-size: 20px;
-  padding: 12px 20px; 
+  padding: 12px 20px;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s; 
+  transition: background-color 0.3s, box-shadow 0.3s;
   margin: 0 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .carousel-button:hover {
-  background-color: #0056b3; 
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
+  background-color: #0056b3;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .carousel-button:active {
-  background-color: #004085; 
-  transform: scale(0.95); 
+  background-color: #004085;
+  transform: scale(0.95);
 }
 
 .carousel-button:focus {
-  outline: none; 
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); 
-}
-
-.search-container {
-  z-index: 2;
-  top: 5% !important;
-  position: absolute;
-  margin: 20px; 
-  display: flex;
-  justify-content: center;
-  padding-top: 1.5%;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  border-radius: 25px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.search-input {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 25px 0 0 25px;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
 }
 
-.search-button {
-  background-color: #007bff;
-  border: none;
-  padding: 10px;
-  border-radius: 0 25px 25px 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.search-button .fa-search {
-  color: white;
-}
-
-/* Estilos para la Barra de Navegación */
-.navbar {
-  width: 100%;
-  background-color: #007aff;
-  color: white;
-  padding: 10px 0;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-
-.navbar-container {
-  display: flex;
-  align-items: center; 
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-  flex-wrap: wrap; 
-  justify-content: space-between;
-}
-
-.navbar h1 {
-  margin: 0; 
-  font-size: 1.5rem; 
-  text-align: center; 
-}
-
-.navbar nav {
-  display: flex;
-  align-items: center; 
-}
-
-.navbar nav .logo {
-  height: 40px; 
-  width: auto; 
-}
-
-/* Estilos Responsivos */
-@media (max-width: 1024px) {
-  .navbar h1 {
-    font-size: 1.3rem;
-  }
-
-  .carousel-button {
-    width: 8%; 
-  }
-
-  .logo {
-    height: 35px; 
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar h1 {
-    font-size: 1.2rem;
-  }
-
-  .navbar nav {
-    flex-direction: column;
-    align-items: center; 
-  }
-
-  .navbar nav .logo {
-    height: 30px; 
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar h1 {
-    font-size: 1rem;
-  }
-
-  .search-container {
-    top: 10px; 
-    margin: 10px; 
-    width: calc(100% - 20px); 
-  }
-
-  .search-box {
-    width: 100%;
-  }
-
-  .search-input {
-    width: 80%;
-    padding: 8px 16px; 
-  }
-
-  .search-button {
-    width: 20%;
-    padding: 8px; 
-  }
-
-  .carousel-button {
-    width: 12%; 
-  }
-
-  .logo {
-    height: 25px; 
-  }
-}
-
-body {
-  margin-top: 60px;
+.pagination-info {
+  margin: 0 10px;
 }
