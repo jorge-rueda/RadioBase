@@ -2,11 +2,11 @@ const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
 const client = new MongoClient(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+const cache = {}; // Caché en memoria
 
 exports.handler = async (event) => {
   const { searchTerm } = event.queryStringParameters || {};
   const cacheKey = searchTerm || 'all';
-  const cache = {}; // Consider implementing a more sophisticated cache strategy
 
   // Verifica si los resultados están en el caché
   if (cache[cacheKey]) {

@@ -4,6 +4,9 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
+// Caché para los resultados en el frontend
+const cache = {};
+
 const App = () => {
     const [data, setData] = useState([]); 
     const [searchTerm, setSearchTerm] = useState('');  
@@ -14,11 +17,22 @@ const App = () => {
     }, [searchTerm]);
 
     const fetchData = async (searchTerm) => {
+        // Verifica si los datos están en el caché local
+        if (cache[searchTerm]) {
+            setData(cache[searchTerm]);
+            return;
+        }
+
         try {
             const response = await axios.get('/.netlify/functions/api-radiobases', {
                 params: { searchTerm }
             });
-            setData(response.data);
+
+            const fetchedData = response.data;
+            setData(fetchedData);
+
+            // Almacena los datos en el caché local
+            cache[searchTerm] = fetchedData;
         } catch (error) {
             console.error('Error fetching data:', error);
         }
