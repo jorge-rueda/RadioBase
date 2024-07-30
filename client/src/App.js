@@ -26,6 +26,7 @@ const App = () => {
 
             console.log('Fetched Data:', fetchedData);
 
+            // Transformar datos
             const transformedData = fetchedData.reduce((acc, { name, traffic_value, traffic_date }) => {
                 if (!acc[name]) {
                     acc[name] = { name, traffic: {} };
@@ -39,8 +40,13 @@ const App = () => {
 
             console.log('All Dates:', allDates);
 
-            setData(resultArray);
-            cache.current[searchTerm] = { resultArray, allDates };
+            // Filtrar datos según el término de búsqueda
+            const filteredData = resultArray.filter(radiobase => 
+                radiobase.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            setData(filteredData);
+            cache.current[searchTerm] = { resultArray: filteredData, allDates };
         } catch (error) {
             console.error('Error fetching data:', error);
         }
