@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 const App = () => {
     const [data, setData] = useState([]);
@@ -45,7 +45,19 @@ const App = () => {
     };
 
     // Obtener las fechas de los datos
-    const dates = data.length ? Object.keys(data[0].traffic) : [];
+    const dates = data.length && data[0].traffic ? Object.keys(data[0].traffic) : [];
+
+    // Función para desplazar la tabla horizontalmente
+    const scrollTable = (direction) => {
+        const container = tableContainerRef.current;
+        const scrollAmount = 200;
+
+        if (direction === 'left') {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        } else if (direction === 'right') {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
 
     // Manejar el cambio en el campo de búsqueda
     const handleSearchChange = (event) => {
@@ -79,8 +91,16 @@ const App = () => {
                 </div>
             </div>
 
-            {/* Contenedor de la tabla */}
+            {/* Contenedor de la tabla con controles de carrusel */}
             <div className="table-wrapper">
+                <div className="carousel-controls">
+                    <button onClick={() => scrollTable('left')} className="carousel-button">
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                    <button onClick={() => scrollTable('right')} className="carousel-button">
+                        <FontAwesomeIcon icon={faArrowRight} />
+                    </button>
+                </div>
                 <div className="table-container" ref={tableContainerRef}>
                     <table>
                         <thead>
