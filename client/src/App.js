@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const PAGE_SIZE = 10; // Número de registros por página
+// Define el tamaño de la página
+const PAGE_SIZE = 10;
 
 const PaginatedTable = () => {
   const [data, setData] = useState([]);
@@ -9,10 +10,17 @@ const PaginatedTable = () => {
 
   // Función para obtener los datos
   const fetchData = async () => {
-    const response = await fetch('/api/data');
-    const result = await response.json();
-    setData(result);
-    setTotalPages(Math.ceil(result.length / PAGE_SIZE));
+    try {
+      // Reemplaza '/api/data' con la URL de tu API
+      const response = await fetch('/api/data');
+      const result = await response.json();
+      setData(result);
+
+      // Calcula el total de páginas
+      setTotalPages(Math.ceil(result.length / PAGE_SIZE));
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
   };
 
   // Obtener los datos al montar el componente
@@ -38,17 +46,19 @@ const PaginatedTable = () => {
       <table>
         <thead>
           <tr>
-            <th>Columna 1</th>
-            <th>Columna 2</th>
-            {/* Agrega más encabezados según sea necesario */}
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Valor de Tráfico</th>
+            <th>Fecha de Tráfico</th>
           </tr>
         </thead>
         <tbody>
-          {paginatedData.map((item, index) => (
-            <tr key={index}>
-              <td>{item.columna1}</td>
-              <td>{item.columna2}</td>
-              {/* Agrega más celdas según sea necesario */}
+          {paginatedData.map((item) => (
+            <tr key={item._id}>
+              <td>{item._id}</td>
+              <td>{item.name}</td>
+              <td>{item.traffic_value}</td>
+              <td>{item.traffic_date}</td>
             </tr>
           ))}
         </tbody>
