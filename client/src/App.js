@@ -14,6 +14,7 @@ const App = () => {
     const tableContainerRef = useRef(null);
     const cache = useRef({});
 
+    // Función para filtrar y actualizar datos
     const fetchData = useCallback(async (searchTerm) => {
         if (cache.current[searchTerm]) {
             setData(cache.current[searchTerm].resultArray);
@@ -50,6 +51,7 @@ const App = () => {
         fetchData(searchTerm);
     }, [fetchData, searchTerm]);
 
+    // Función para obtener el color basado en el valor
     const getColor = (value) => {
         if (value === undefined) return 'grey';
         if (value <= 15) return 'red';
@@ -61,6 +63,7 @@ const App = () => {
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
     console.log('Dates:', dates);
 
+    // Paginación
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const paginatedData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
