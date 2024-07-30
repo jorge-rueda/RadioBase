@@ -14,13 +14,15 @@ const App = () => {
 
     const fetchData = useCallback(async (searchTerm) => {
         if (cache.current[searchTerm]) {
-            setData(cache.current[searchTerm]);
+            setData(cache.current[searchTerm].resultArray);
             return;
         }
 
         try {
             const response = await axios.get(API_URL, { params: { searchTerm } });
             const fetchedData = response.data;
+
+            console.log('Fetched Data:', fetchedData); // Verifica los datos aquí
 
             // Transformar los datos a la estructura esperada
             const transformedData = fetchedData.reduce((acc, { name, traffic_value, traffic_date }) => {
@@ -32,9 +34,9 @@ const App = () => {
             }, {});
 
             const resultArray = Object.values(transformedData);
-
-            // Obtener todas las fechas únicas
             const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date)));
+
+            console.log('All Dates:', allDates); // Verifica las fechas aquí
 
             setData(resultArray);
             cache.current[searchTerm] = { resultArray, allDates };
@@ -69,6 +71,7 @@ const App = () => {
 
     // Extraer las fechas del caché
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
+    console.log('Dates:', dates); // Verifica las fechas aquí
 
     const scrollTable = (direction) => {
         const container = tableContainerRef.current;
