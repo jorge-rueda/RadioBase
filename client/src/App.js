@@ -1,3 +1,11 @@
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import axios from 'axios';
+import './App.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+
+const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
+
 const App = () => {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -13,7 +21,6 @@ const App = () => {
         try {
             const response = await axios.get(API_URL, { params: { searchTerm } });
             const fetchedData = response.data;
-            console.log('Fetched Data:', fetchedData); // Verifica los datos recibidos
             setData(fetchedData);
             cache.current[searchTerm] = fetchedData;
         } catch (error) {
@@ -45,9 +52,6 @@ const App = () => {
     };
 
     const dates = data.length ? Object.keys(data[0].traffic || {}) : [];
-
-    console.log('Dates:', dates); // Verifica las fechas obtenidas
-    console.log('Data State:', data); // Verifica el estado de los datos
 
     const scrollTable = (direction) => {
         const container = tableContainerRef.current;
