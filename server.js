@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 // Conexión a MySQL
 const db = mysql.createConnection({
-    host: 'localhost',
+    host: 'mongodb+srv://root:alberto1443@radiobase.crdmddx.mongodb.net/?retryWrites=true&w=majority&appName=radiobase',
     user: 'root',
     password: 'alberto1443',
     database: 'radiobase'

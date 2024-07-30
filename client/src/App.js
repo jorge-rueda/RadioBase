@@ -9,30 +9,29 @@ const App = () => {
     const [searchTerm, setSearchTerm] = useState('');  
     const tableContainerRef = useRef(null);  
 
-    // Hook para obtener datos cuando cambia el término de búsqueda
     useEffect(() => {
         fetchData(searchTerm);
     }, [searchTerm]);
 
-    // Función para obtener datos de la API
-    const fetchData = (searchTerm) => {
-        axios.get('http://localhost:3000/api/radiobases', {
-            params: { searchTerm }
-        })
-        .then(response => setData(response.data))
-        .catch(error => console.error('Error fetching data:', error));
+    const fetchData = async (searchTerm) => {
+        try {
+            const response = await axios.get('/.netlify/functions/api-radiobases', {
+                params: { searchTerm }
+            });
+            setData(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
-    // Función para determinar el color de la celda basado en el valor
     const getColor = (value) => {
         if (value === undefined) return 'grey';
         if (value <= 15) return 'red';
         if (value > 15 && value <= 40) return 'orange';
         if (value > 40 && value <= 90) return 'yellow';
-        if (value > 90) return 'green';
+        return 'green'; // Valor > 90
     };
 
-    // Función para formatear la fecha en español
     const formatDate = (dateStr) => {
         try {
             const date = new Date(dateStr);
@@ -44,10 +43,8 @@ const App = () => {
         }
     };
 
-    // Obtener las fechas de los datos
-    const dates = data.length ? Object.keys(data[0].traffic) : [];
+    const dates = data.length ? Object.keys(data[0].traffic || {}) : [];
 
-    // Función para desplazar la tabla horizontalmente
     const scrollTable = (direction) => {
         const container = tableContainerRef.current;
         const scrollAmount = 200;
@@ -59,7 +56,6 @@ const App = () => {
         }
     };
 
-    // Manejar el cambio en el campo de búsqueda
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
@@ -75,7 +71,6 @@ const App = () => {
                 </div>
             </header>
             
-            {/* Contenedor de búsqueda */}
             <div className="search-container">
                 <div className="search-box">
                     <input
@@ -91,7 +86,6 @@ const App = () => {
                 </div>
             </div>
 
-            {/* Contenedor de la tabla con controles de carrusel */}
             <div className="table-wrapper">
                 <div className="carousel-controls">
                     <button onClick={() => scrollTable('left')} className="carousel-button">
