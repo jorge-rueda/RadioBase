@@ -35,7 +35,7 @@ const App = () => {
             }, {});
 
             const resultArray = Object.values(transformedData);
-            const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date)));
+            const allDates = Array.from(new Set(fetchedData.map(item => item.traffic_date))).sort();
 
             console.log('All Dates:', allDates);
 
