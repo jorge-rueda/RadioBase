@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,13 +11,10 @@ const App = () => {
     const [data, setData] = useState([]); 
     const [searchTerm, setSearchTerm] = useState('');  
     const tableContainerRef = useRef(null);  
-    const cache = {}; // Define el caché aquí
+    const cache = useRef({}).current;
 
-    useEffect(() => {
-        fetchData(searchTerm);
-    }, [searchTerm]);
-
-    const fetchData = async (searchTerm) => {
+    // Usa useCallback para memorizar fetchData
+    const fetchData = useCallback(async (searchTerm) => {
         // Verifica si los resultados están en el caché
         if (cache[searchTerm]) {
             setData(cache[searchTerm]);
@@ -37,7 +34,11 @@ const App = () => {
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchData(searchTerm);
+    }, [fetchData, searchTerm]);
 
     const getColor = (value) => {
         if (value === undefined) return 'grey';
