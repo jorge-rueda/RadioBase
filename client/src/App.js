@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://radiobase.netlify.app/.netlify/functions/api-radiobases';
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 20; // Cambiado a 20
 
 const App = () => {
     const [data, setData] = useState([]);
@@ -56,18 +56,6 @@ const App = () => {
         if (value > 15 && value <= 40) return 'orange';
         if (value > 40 && value <= 90) return 'yellow';
         return 'green';
-    };
-
-    const formatDate = (dateStr) => {
-        try {
-            const [day, month, year] = dateStr.split('/').reverse();
-            const date = new Date(`${year}-${month}-${day}`);
-            const options = { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' };
-            return date.toLocaleDateString('es-MX', options);
-        } catch (error) {
-            console.error('Error formatting date:', error);
-            return dateStr;
-        }
     };
 
     const dates = (cache.current[searchTerm] && cache.current[searchTerm].allDates) || [];
@@ -140,7 +128,7 @@ const App = () => {
                         <thead>
                             <tr>
                                 <th>Radiobases</th>
-                                {dates.map(date => <th key={date}>{formatDate(date)}</th>)}
+                                {dates.map(date => <th key={date}>{date}</th>)}
                             </tr>
                         </thead>
                         <tbody>
