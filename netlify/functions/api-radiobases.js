@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     try {
         await client.connect();
         const database = client.db('radiobase');
-        const collection = database.collection('radiobases');
+        const collection = database.collection('radiobase');
 
         const query = searchTerm ? { name: { $regex: searchTerm, $options: 'i' } } : {};
         const cursor = collection.find(query).sort({ name: 1, traffic_date: 1 });

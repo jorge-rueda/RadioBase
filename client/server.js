@@ -27,7 +27,7 @@ client.connect(err => {
 // Caché en memoria para optimizar búsqueda
 const cache = {};
 
-app.get('/api/radiobases', async (req, res) => {
+app.get('/api/radiobase', async (req, res) => {
     const searchTerm = req.query.searchTerm || '';
     const cacheKey = searchTerm || 'all';
 
