@@ -1,33 +1,30 @@
 const express = require('express');
-const mysql = require('mysql2');
+const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
 app.use(cors());
 app.use(bodyParser.json());
 
-// Conexión a MySQL
-const db = mysql.createConnection({
-    host: 'mongodb+srv://root:alberto1443@radiobase.crdmddx.mongodb.net/?retryWrites=true&w=majority&appName=radiobase',
-    user: 'root',
-    password: 'alberto1443',
-    database: 'radiobase'
-});
+// Conexión a MongoDB
+const client = new MongoClient(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+const dbName = 'radiobase';
+let db;
 
-db.connect(err => {
+client.connect(err => {
     if (err) throw err;
-    console.log('MySQL Connected...');
+    console.log('MongoDB Connected...');
+    db = client.db(dbName);
 });
 
-// Caché en memoria para optimizar busqueda
+// Caché en memoria para optimizar búsqueda
 const cache = {};
 
-
-app.get('/api/radiobases', (req, res) => {
+app.get('/api/radiobases', async (req, res) => {
     const searchTerm = req.query.searchTerm || '';
     const cacheKey = searchTerm || 'all';
 
@@ -36,16 +33,10 @@ app.get('/api/radiobases', (req, res) => {
         return res.json(cache[cacheKey]);
     }
 
-    // Consulta SQL
-    const query = `
-        SELECT name, traffic_value, traffic_date 
-        FROM radiobases 
-        WHERE name LIKE ?
-        ORDER BY name, traffic_date;
-    `;
-
-    db.query(query, [`%${searchTerm}%`], (err, results) => {
-        if (err) throw err;
+    try {
+        const collection = db.collection('radiobases');
+        const query = searchTerm ? { name: { $regex: searchTerm, $options: 'i' } } : {};
+        const results = await collection.find(query).sort({ name: 1, traffic_date: 1 }).toArray();
 
         const data = results.reduce((acc, row) => {
             const { name, traffic_value, traffic_date } = row;
@@ -59,7 +50,10 @@ app.get('/api/radiobases', (req, res) => {
         // Almacena los resultados en caché
         cache[cacheKey] = resultArray;
         res.json(resultArray);
-    });
+    } catch (err) {
+        console.error('Database error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 app.listen(PORT, () => {
